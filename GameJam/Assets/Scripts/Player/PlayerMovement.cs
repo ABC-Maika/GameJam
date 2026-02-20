@@ -27,10 +27,39 @@ public class PlayerMovement : MonoBehaviour
 
 	private void FixedUpdate()
 	{
+<<<<<<< Updated upstream
         if (!isKnockedBack)
         {
             rb.linearVelocity = new Vector2(moveInput.x * stats.speed, rb.linearVelocity.y);
         }
+=======
+		isGrounded = Physics2D.OverlapCircle(transform.position, 1f, groundLayer);
+
+
+		
+		if (isKnockedBack)
+		{
+			return;
+		}
+
+		float targetSpeed = moveInput.x * stats.speed;
+
+		float accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 50f : 30f;
+
+		float newX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeed, accelerationRate * Time.fixedDeltaTime);
+
+        float finalX = newX;
+
+        // If wind is pushing in same direction as input,
+        // don't clamp the velocity down
+        if (Mathf.Sign(moveInput.x) == Mathf.Sign(rb.linearVelocity.x) &&
+            Mathf.Abs(rb.linearVelocity.x) > Mathf.Abs(newX))
+        {
+            finalX = rb.linearVelocity.x;
+        }
+
+        rb.linearVelocity = new Vector2(finalX, rb.linearVelocity.y);
+>>>>>>> Stashed changes
     }
 
 	private void Jump()
