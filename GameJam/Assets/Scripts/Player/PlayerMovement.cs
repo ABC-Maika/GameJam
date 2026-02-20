@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
 	private PlayerControls controls;
 	private Vector2 moveInput;
 	private Rigidbody2D rb;
-	private PlayerStats stats = new PlayerStats();
+	public PlayerStats stats = new PlayerStats();
 	
 	[SerializeField] private LayerMask groundLayer;
 
@@ -55,7 +55,6 @@ public class PlayerMovement : MonoBehaviour
 
 		float newX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeed, accelerationRate * Time.fixedDeltaTime);
 
-		print($"Target Speed: {targetSpeed}, Current Speed: {rb.linearVelocity.x}, New Speed: {newX}");
 
         float finalX = newX;
 
