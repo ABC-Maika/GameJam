@@ -8,7 +8,6 @@ public class PlayerMovement : MonoBehaviour
 	private Rigidbody2D rb;
 	private PlayerStats stats = new PlayerStats();
 	
-	[SerializeField] private float currentSpeed;
 	[SerializeField] private LayerMask groundLayer;
 
 	[SerializeField] private bool isGrounded = true;
@@ -37,11 +36,11 @@ public class PlayerMovement : MonoBehaviour
 		
 		float targetSpeed = moveInput.x * stats.speed;
 
-		float accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 10f : 50f;
+		float accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 50f : 30f;
 
-		currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, accelerationRate * Time.fixedDeltaTime);
+		float newX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeed, accelerationRate * Time.fixedDeltaTime);
 
-		rb.linearVelocity = new Vector2(currentSpeed, rb.linearVelocity.y);
+		rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
 	}
 
 	private void Jump()
