@@ -131,7 +131,7 @@ public class PlayerMovement : MonoBehaviour
 			rb.linearVelocity = new Vector2(rb.linearVelocity.x, autoJumpForce);
 		}
 	}
-
+	
 	public void ApplyKnockback(Vector2 force)
 	{
 		isKnockedBack = true;
