@@ -59,6 +59,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         rb.linearVelocity = new Vector2(finalX, rb.linearVelocity.y);
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
 
