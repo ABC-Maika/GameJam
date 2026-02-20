@@ -20,11 +20,6 @@ public class PlayerStats
         sprint = 7f;
         jumpSpeed = 8f;
 	}
-    public float power;
-    public float maxHealth = 100;
-    public float health = 100;
-    public float stamina;
-    public float sprint;
 
     public void takeDamage(float damage)
     {
