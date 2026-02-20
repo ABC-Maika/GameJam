@@ -12,21 +12,20 @@ public class CamMovement : MonoBehaviour
 	[SerializeField] private float lookAheadDistance = 2f;
 
 	private Vector3 _currentVelocity;
+	private float _smoothedLookAhead;
 
-	void LateUpdate()
+	void FixedUpdate()
 	{
 		if (target == null) return;
 
-		Vector3 targetPosition = target.position + offset;
+		float targetLookAhead = (target.localScale.x > 0 ? 1 : -1) * lookAheadDistance;
+		_smoothedLookAhead = Mathf.MoveTowards(_smoothedLookAhead, targetLookAhead, Time.fixedDeltaTime * 10f);
 
-		float moveDirection = target.localScale.x > 0 ? 1 : -1;
-		Vector3 lookAheadOffset = Vector3.right * (moveDirection * lookAheadDistance);
-
-		Vector3 finalGoal = targetPosition + lookAheadOffset;
+		Vector3 targetPosition = target.position + offset + (Vector3.right * _smoothedLookAhead);
 
 		transform.position = Vector3.SmoothDamp(
 			transform.position,
-			finalGoal,
+			targetPosition,
 			ref _currentVelocity,
 			smoothTime
 		);
