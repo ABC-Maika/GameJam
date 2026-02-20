@@ -7,6 +7,11 @@ public class PlayerMovement : MonoBehaviour
 	private Vector2 moveInput;
 	private Rigidbody2D rb;
 	private PlayerStats stats = new PlayerStats();
+	
+	[SerializeField] private float currentSpeed;
+	[SerializeField] private LayerMask groundLayer;
+
+	[SerializeField] private bool isGrounded = true;
 
 	void Awake()
 	{
@@ -26,11 +31,23 @@ public class PlayerMovement : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		rb.linearVelocity = new Vector2(moveInput.x * stats.speed, rb.linearVelocity.y);
+		isGrounded = Physics2D.OverlapCircle(transform.position, 1f, groundLayer);
+
+		if (!isGrounded) return;
+		
+		float targetSpeed = moveInput.x * stats.speed;
+
+		float accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 10f : 50f;
+
+		currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, accelerationRate * Time.fixedDeltaTime);
+
+		rb.linearVelocity = new Vector2(currentSpeed, rb.linearVelocity.y);
 	}
 
 	private void Jump()
 	{
+		if (!isGrounded) return;
+
 		rb.linearVelocity = new Vector2(rb.linearVelocity.x, stats.jumpSpeed);
 	}
 }
