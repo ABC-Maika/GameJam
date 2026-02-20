@@ -12,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
 
 	[SerializeField] private bool isGrounded = true;
 
+	private bool isKnockedBack = false;
+
 	void Awake()
 	{
 		rb = GetComponent<Rigidbody2D>();
@@ -34,6 +36,11 @@ public class PlayerMovement : MonoBehaviour
 
 		if (!isGrounded) return;
 		
+		if (isKnockedBack)
+		{
+			return;
+		}
+
 		float targetSpeed = moveInput.x * stats.speed;
 
 		float accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 50f : 30f;
@@ -48,5 +55,20 @@ public class PlayerMovement : MonoBehaviour
 		if (!isGrounded) return;
 
 		rb.linearVelocity = new Vector2(rb.linearVelocity.x, stats.jumpSpeed);
+	}
+
+	public void ApplyKnockback(Vector2 force)
+	{
+		isKnockedBack = true;
+
+		rb.linearVelocity = Vector2.zero;
+		rb.AddForce(force, ForceMode2D.Impulse);
+
+		Invoke(nameof(ResetKnockback), 0.2f); // tweak time if needed
+	}
+
+	private void ResetKnockback()
+	{
+		isKnockedBack = false;
 	}
 }

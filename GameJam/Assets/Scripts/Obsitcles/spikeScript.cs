@@ -15,20 +15,18 @@ public class spikeScript : MonoBehaviour
     {
         
     }
-    private void ApplyKnockback(GameObject player)
-    {
-        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            // Calculate direction: Away from the spike, slightly upward
-            Vector2 direction = (player.transform.position - transform.position).normalized;
-            direction += Vector2.up * 0.5f;
+	private void ApplyKnockback(GameObject player)
+	{
+		PlayerMovement movement = player.GetComponent<PlayerMovement>();
+		if (movement != null)
+		{
+			float angle = transform.eulerAngles.z * Mathf.Deg2Rad;
+			Vector2 direction = new Vector2(-Mathf.Sin(angle), Mathf.Cos(angle));
 
-            rb.linearVelocity = Vector2.zero; // Reset speed for a clean "pop"
-            rb.AddForce(direction * knockbackForce, ForceMode2D.Impulse);
-        }
-    }
-    private void OnCollisionEnter2D(Collision2D collision)
+			movement.ApplyKnockback(direction.normalized * knockbackForce);
+		}
+	}
+	private void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.tag == "Player")
         {
