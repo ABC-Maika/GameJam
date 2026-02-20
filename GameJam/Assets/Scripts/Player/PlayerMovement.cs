@@ -38,8 +38,11 @@ public class PlayerMovement : MonoBehaviour
 
 	private void FixedUpdate()
 	{
+
 		// 1. Precise Ground Check
 		isGrounded = Physics2D.OverlapCircle((Vector2)transform.position + groundCheckOffset, groundCheckRadius, groundLayer);
+
+		isGrounded = Physics2D.OverlapCircle(transform.position, 1.5f, groundLayer);
 
 		// 2. Handle Rotation Logic
 		HandleRotationState();
