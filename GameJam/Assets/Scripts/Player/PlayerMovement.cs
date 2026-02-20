@@ -73,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
 			ExecuteJump();
 		}
 
-		HandleSpriteRotation();
+		//HandleSpriteRotation();
 	}
 
 	private void FixedUpdate()
