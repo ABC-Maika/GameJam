@@ -91,8 +91,18 @@ public class PlayerMovement : MonoBehaviour
 		float accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 50f : 30f;
 		float newX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeed, accelerationRate * Time.fixedDeltaTime);
 
-		rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
-	}
+        float finalX = newX;
+
+        // If wind is pushing in same direction as input,
+        // don't clamp the velocity down
+        if (Mathf.Sign(moveInput.x) == Mathf.Sign(rb.linearVelocity.x) &&
+            Mathf.Abs(rb.linearVelocity.x) > Mathf.Abs(newX))
+        {
+            finalX = rb.linearVelocity.x;
+        }
+
+        rb.linearVelocity = new Vector2(finalX, rb.linearVelocity.y);
+    }
 
 	private void HandleSpriteRotation()
 	{
