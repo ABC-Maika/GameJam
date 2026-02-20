@@ -10,7 +10,7 @@ public class PlayerMovement : MonoBehaviour
 	private Vector2 moveInput;
 	private Rigidbody2D rb;
 	public PlayerStats stats = new PlayerStats();
-
+  
 	[Header("Sprite Rotation")]
 	[SerializeField] private Transform[] spriteChild;
 	[SerializeField] private float rotationSpeed = 180f;
