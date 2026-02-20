@@ -13,6 +13,8 @@ public class PlayerMovement : MonoBehaviour
 	[SerializeField] private bool isGrounded = true;
 
 	private bool isKnockedBack = false;
+	private Quaternion originalRotation;
+	private bool has_jumped = false;
 
 	void Awake()
 	{
@@ -25,6 +27,8 @@ public class PlayerMovement : MonoBehaviour
 		controls.Player.Jump.performed += ctx => Jump();
 		controls.Player.Sprint.performed += ctx => stats.speed = stats.sprint;
 		controls.Player.Sprint.canceled += ctx => stats.speed = stats.normalSpeed;
+
+		originalRotation = transform.rotation;
 	}
 
 	private void OnEnable() => controls.Enable();
@@ -33,9 +37,13 @@ public class PlayerMovement : MonoBehaviour
 	private void FixedUpdate()
 	{
 		isGrounded = Physics2D.OverlapCircle(transform.position, 1f, groundLayer);
-
-		if (!isGrounded) return;
 		
+		if (has_jumped && !isGrounded)
+		{
+			rb.rotation = originalRotation.eulerAngles.z; // Lock rotation while in air
+			has_jumped = false;
+		}
+
 		if (isKnockedBack)
 		{
 			return;
@@ -47,6 +55,8 @@ public class PlayerMovement : MonoBehaviour
 
 		float newX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeed, accelerationRate * Time.fixedDeltaTime);
 
+		print($"Target Speed: {targetSpeed}, Current Speed: {rb.linearVelocity.x}, New Speed: {newX}");
+
 		rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
 	}
 
@@ -55,6 +65,8 @@ public class PlayerMovement : MonoBehaviour
 		if (!isGrounded) return;
 
 		rb.linearVelocity = new Vector2(rb.linearVelocity.x, stats.jumpSpeed);
+
+		has_jumped = true;
 	}
 
 	public void ApplyKnockback(Vector2 force)

@@ -13,11 +13,11 @@ public class PlayerStats
 
     public PlayerStats()
     {
-        speed = 5f;
+        speed = 7f;
         power = 10f;
         health = 100f;
         stamina = 100f;
-        sprint = 7f;
+        sprint = 10f;
         jumpSpeed = 8f;
 	}
 

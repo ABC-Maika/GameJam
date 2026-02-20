@@ -4,7 +4,7 @@ public class CamMovement : MonoBehaviour
 {
 	[Header("Targeting")]
 	[SerializeField] private Transform target;
-	[SerializeField] private Vector3 offset = new Vector3(0, 2, -10);
+	[SerializeField] private Vector3 offset = new Vector3(0, 1, -10);
 
 	[Header("Smooth Settings")]
 	[Range(0, 1)]
