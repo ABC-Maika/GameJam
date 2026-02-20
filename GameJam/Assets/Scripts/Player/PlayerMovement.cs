@@ -57,8 +57,18 @@ public class PlayerMovement : MonoBehaviour
 
 		print($"Target Speed: {targetSpeed}, Current Speed: {rb.linearVelocity.x}, New Speed: {newX}");
 
-		rb.linearVelocity = new Vector2(newX, rb.linearVelocity.y);
-	}
+        float finalX = newX;
+
+        // If wind is pushing in same direction as input,
+        // don't clamp the velocity down
+        if (Mathf.Sign(moveInput.x) == Mathf.Sign(rb.linearVelocity.x) &&
+            Mathf.Abs(rb.linearVelocity.x) > Mathf.Abs(newX))
+        {
+            finalX = rb.linearVelocity.x;
+        }
+
+        rb.linearVelocity = new Vector2(finalX, rb.linearVelocity.y);
+    }
 
 	private void Jump()
 	{
