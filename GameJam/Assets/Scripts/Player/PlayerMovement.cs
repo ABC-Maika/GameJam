@@ -1,4 +1,7 @@
+using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
@@ -6,10 +9,10 @@ public class PlayerMovement : MonoBehaviour
 	private PlayerControls controls;
 	private Vector2 moveInput;
 	private Rigidbody2D rb;
-	private PlayerStats stats = new PlayerStats();
+	public PlayerStats stats = new PlayerStats();
 
 	[Header("Sprite Rotation")]
-	[SerializeField] private Transform spriteChild;
+	[SerializeField] private Transform[] spriteChild;
 	[SerializeField] private float rotationSpeed = 180f;
 
 	[Header("Detection")]
@@ -28,8 +31,11 @@ public class PlayerMovement : MonoBehaviour
 	[SerializeField] private float jumpBufferTime = 0.15f;
 	private float jumpBufferCounter;
 
-	private bool isGrounded;
+	public bool isGrounded;
 	private bool isKnockedBack = false;
+	private int currentChildIndex = 0;
+	private bool hasJumped = false;
+	[SerializeField] private float jumps = 0;
 
 	void Awake()
 	{
@@ -60,6 +66,7 @@ public class PlayerMovement : MonoBehaviour
 		if (isGrounded)
 		{
 			coyoteTimeCounter = coyoteTime;
+			if (!hasJumped) jumps = 0; 
 		}
 		else
 		{
@@ -68,12 +75,34 @@ public class PlayerMovement : MonoBehaviour
 
 		jumpBufferCounter -= Time.deltaTime;
 
-		if (jumpBufferCounter > 0f && coyoteTimeCounter > 0f)
+		if (jumpBufferCounter > 0f)
 		{
-			ExecuteJump();
+			if (coyoteTimeCounter > 0f)
+			{
+				ExecuteJump();
+			}
+
+			else if (jumps == 1 && currentChildIndex == 1)
+			{
+				ExecuteJump();
+			}
 		}
 
-		//HandleSpriteRotation();
+		HandleSpriteRotation();
+
+		if (Keyboard.current.cKey.wasReleasedThisFrame)
+		{
+			if (currentChildIndex < spriteChild.Length - 1)
+			{
+				currentChildIndex++;
+				ChangeChild(currentChildIndex);
+			}
+			else
+			{
+				currentChildIndex = 0;
+				ChangeChild(currentChildIndex);
+			}
+		}
 	}
 
 	private void FixedUpdate()
@@ -88,7 +117,7 @@ public class PlayerMovement : MonoBehaviour
 		}
 
 		float targetSpeed = moveInput.x * stats.speed;
-		float accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f) ? 50f : 30f;
+		float accelerationRate = (Mathf.Abs(targetSpeed) > 0.01f) ? stats.aceleration : stats.aceleration - 20;
 		float newX = Mathf.MoveTowards(rb.linearVelocity.x, targetSpeed, accelerationRate * Time.fixedDeltaTime);
 
         float finalX = newX;
@@ -104,18 +133,47 @@ public class PlayerMovement : MonoBehaviour
         rb.linearVelocity = new Vector2(finalX, rb.linearVelocity.y);
     }
 
+	private void ChangeChild(int childNum)
+	{
+		for (int i = 0; i < spriteChild.Length; i ++)
+		{
+			spriteChild[i].gameObject.SetActive(i == childNum);
+		}
+
+		ChangeChildStats(childNum);
+	}
+
+	private void ChangeChildStats(int index)
+	{
+		switch (index)
+		{
+			case 0:
+				stats.speed = 10;
+				stats.aceleration = 50f;
+				stats.jumpSpeed = 8f;
+				break;
+			case 1:
+				stats.speed = 5;
+				stats.aceleration = 70f;
+				stats.jumpSpeed = 11f;
+				break;
+		}
+
+		print("Speed: " + stats.speed + " | Acceleration: " + stats.aceleration + " | Jump Speed: " + stats.jumpSpeed);
+	}
+
 	private void HandleSpriteRotation()
 	{
 		if (spriteChild == null) return;
 
-		if (Mathf.Abs(rb.linearVelocity.x) > 0.1f)
+		if (moveInput.x > 0.01f)
 		{
-			float rotationAmount = rb.linearVelocity.x * rotationSpeed * Time.deltaTime;
-			spriteChild.Rotate(Vector3.forward, -rotationAmount);
+			transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 		}
-		else if (isGrounded)
+
+		else if (moveInput.x < -0.01f)
 		{
-			spriteChild.rotation = Quaternion.Lerp(spriteChild.rotation, Quaternion.identity, Time.deltaTime * 10f);
+			transform.rotation = Quaternion.Euler(0f, 180f, 0f);
 		}
 	}
 
@@ -123,8 +181,15 @@ public class PlayerMovement : MonoBehaviour
 	{
 		rb.linearVelocity = new Vector2(rb.linearVelocity.x, stats.jumpSpeed);
 
+		jumps++;
+
 		jumpBufferCounter = 0f;
+
+
 		coyoteTimeCounter = 0f;
+
+		hasJumped = true;
+		StartCoroutine(JumpRevoke());
 	}
 
 	private void CheckForAutoJump()
@@ -156,5 +221,11 @@ public class PlayerMovement : MonoBehaviour
 	{
 		Gizmos.color = isGrounded ? Color.green : Color.red;
 		Gizmos.DrawWireSphere((Vector2)transform.position + groundCheckOffset, groundCheckRadius);
+	}
+
+	IEnumerator JumpRevoke()
+	{
+		yield return new WaitForSeconds(0.1f);
+		hasJumped = false;
 	}
 }

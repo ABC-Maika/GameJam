@@ -4,6 +4,7 @@ public class PlayerStats
 {
     public float speed;
     public float normalSpeed => speed;
+    public float aceleration = 50f;
 
 	public float power;
     public float health;
@@ -13,7 +14,7 @@ public class PlayerStats
 
     public PlayerStats()
     {
-        speed = 7f;
+        speed = 10f;
         power = 10f;
         health = 100f;
         stamina = 100f;
